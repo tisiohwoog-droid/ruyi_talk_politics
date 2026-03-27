@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>台灣政治勢力多維分析</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: rgba(255,255,255,0.08);
+    --text: #e8e4d9;
+    --text-dim: #7a7870;
+    --accent-gold: #c9a84c;
+    --accent-jade: #4ca884;
+    --dpp: #1b8a3e;
+    --kmt: #0033a0;
+    --tpp: #28c8c8;
+    --npp: #ffd700;
+    --tsu: #e84545;
+    --pfp: #e8720c;
+    --mkt: #9b59b6;
+    --independent: #888;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(201,168,76,0.05) 0%, transparent 100%);
+    overflow: hidden;
+  }
+  header::before {
+    content: '政';
+    position: absolute;
+    right: -20px;
+    top: -40px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 280px;
+    font-weight: 900;
+    color: rgba(201,168,76,0.04);
+    pointer-events: none;
+    line-height: 1;
+  }
+  header h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(24px, 4vw, 42px);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--accent-gold);
+    line-height: 1.3;
+  }
+  header p {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── NAV TABS ── */
+  nav {
+    display: flex;
+    gap: 0;
+    padding: 0 40px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 18px 24px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.25s;
+    letter-spacing: 0.05em;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--accent-gold);
+    border-bottom-color: var(--accent-gold);
+  }
+
+  /* ── MAIN ── */
+  main {
+    padding: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ── PARTY CARDS GRID ── */
+  .party-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .party-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .party-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--party-color, #888);
+  }
+  .party-card:hover {
+    background: var(--surface2);
+    border-color: rgba(255,255,255,0.14);
+    transform: translateY(-1px);
+  }
+  .party-card.expanded { grid-column: 1 / -1; }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .party-name {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--party-color, #888);
+    line-height: 1.2;
+  }
+  .party-name-en {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-dim);
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+  .party-badge {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    padding: 3px 8px;
+    border: 1px solid;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .badge-ruling { border-color: var(--accent-jade); color: var(--accent-jade); }
+  .badge-major-opp { border-color: #7090d0; color: #7090d0; }
+  .badge-minor { border-color: var(--text-dim); color: var(--text-dim); }
+
+  .party-desc {
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: #b0ac9e;
+    margin-bottom: 16px;
+  }
+
+  /* Dimension bars */
+  .dim-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .dim-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 80px;
+    flex-shrink: 0;
+    letter-spacing: 0.03em;
+  }
+  .dim-bar-wrap {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: visible;
+    position: relative;
+  }
+  .dim-bar {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--party-color, #888);
+    opacity: 0.7;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .dim-val {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-dim);
+    width: 28px;
+    text-align: right;
+  }
+
+  /* Tags */
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-dim);
+    letter-spacing: 0.03em;
+  }
+
+  /* ── SPECTRUM VIEW ── */
+  .spectrum-container {
+    position: relative;
+    margin: 60px 0;
+  }
+  .spectrum-axis {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+  }
+  .spectrum-track {
+    position: relative;
+    height: 2px;
+    background: linear-gradient(90deg, var(--kmt), rgba(255,255,255,0.15) 50%, var(--dpp));
+    margin: 20px 0 80px;
+  }
+  .spectrum-dot {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--party-color);
+    border: 2px solid var(--bg);
+    cursor: pointer;
+    transition: transform 0.2s;
+    z-index: 2;
+  }
+  .spectrum-dot:hover { transform: translate(-50%, -50%) scale(1.5); }
+  .spectrum-dot-label {
+    position: absolute;
+    top: 20px;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-family: 'Noto Sans TC', sans-serif;
+    white-space: nowrap;
+    color: var(--party-color);
+    font-weight: 500;
+  }
+
+  /* ── AXIS LABELS ── */
+  .axis-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: -60px;
+    margin-bottom: 40px;
+  }
+
+  /* ── 2D SCATTER ── */
+  .scatter-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto 40px;
+  }
+  .scatter-canvas {
+    width: 100%;
+    aspect-ratio: 1;
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .scatter-x-label, .scatter-y-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+  }
+  .scatter-y-label {
+    position: absolute;
+    left: -60px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    transform-origin: center;
+    white-space: nowrap;
+  }
+  .scatter-dot {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: #fff;
+    font-weight: 700;
+  }
+  .scatter-dot:hover { transform: translate(-50%, -50%) scale(1.6); z-index: 10; }
+  .scatter-dot .dot-label {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    white-space: nowrap;
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 500;
+    pointer-events: none;
+  }
+  /* Grid lines */
+  .scatter-canvas::before, .scatter-canvas::after {
+    content: '';
+    position: absolute;
+    background: var(--border);
+  }
+  .scatter-canvas::before { width: 100%; height: 1px; top: 50%; left: 0; }
+  .scatter-canvas::after { height: 100%; width: 1px; left: 50%; top: 0; }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .compare-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .compare-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .compare-table tr:hover td { background: var(--surface2); }
+  .party-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  td:first-child {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 700;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  /* seat bar */
+  .seat-bar {
+    display: flex;
+    height: 6px;
+    gap: 2px;
+    margin-top: 4px;
+  }
+  .seat-segment {
+    height: 100%;
+    border-radius: 1px;
+    background: var(--party-color);
+    opacity: 0.8;
+  }
+
+  /* ── ISSUE GRID ── */
+  .issue-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .issue-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px;
+  }
+  .issue-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent-gold);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .issue-party-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .issue-party-name {
+    font-size: 12px;
+    font-weight: 700;
+    min-width: 40px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .issue-stance {
+    font-size: 12px;
+    color: #a0a08a;
+    line-height: 1.6;
+  }
+  .stance-icon {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 32px;
+    animation: fadeIn 0.4s ease forwards;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: -34px;
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    border: 2px solid var(--bg);
+  }
+  .timeline-year {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent-gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .timeline-text {
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: #b0ac9e;
+  }
+  .timeline-text strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ── ANALYSIS SECTION ── */
+  .analysis-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-gold);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    border-radius: 0 2px 2px 0;
+  }
+  .analysis-block h3 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-gold);
+    margin-bottom: 12px;
+  }
+  .analysis-block p {
+    font-size: 13.5px;
+    line-height: 1.85;
+    color: #b0ac9e;
+  }
+  .analysis-block p + p { margin-top: 10px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    header, nav { padding-left: 20px; padding-right: 20px; }
+    main { padding: 24px 20px; }
+    .scatter-y-label { display: none; }
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: fixed;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 100;
+    max-width: 220px;
+    line-height: 1.6;
+    color: var(--text);
+    display: none;
+  }
+  .tooltip.show { display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>台灣政治勢力<br>多維度分析圖譜</h1>
+  <p>TAIWAN POLITICAL FORCES · MULTIDIMENSIONAL ANALYSIS · 2024–2025</p>
+</header>
+
+<nav>
+  <div class="tab active" data-tab="overview">政黨概覽</div>
+  <div class="tab" data-tab="spectrum">意識形態光譜</div>
+  <div class="tab" data-tab="scatter">二維定位圖</div>
+  <div class="tab" data-tab="issues">重大議題立場</div>
+  <div class="tab" data-tab="comparison">比較分析表</div>
+  <div class="tab" data-tab="history">歷史脈絡</div>
+  <div class="tab" data-tab="analysis">深度分析</div>
+</nav>
+
+<main>
+
+<!-- ══════════ PANEL 1: OVERVIEW ══════════ -->
+<div class="panel active" id="panel-overview">
+  <div class="section-title">主要政黨與政治勢力</div>
+  <div class="party-grid" id="partyGrid"></div>
+</div>
+
+<!-- ══════════ PANEL 2: SPECTRUM ══════════ -->
+<div class="panel" id="panel-spectrum">
+  <div class="section-title">統獨意識形態光譜</div>
+  <div class="spectrum-container">
+    <div class="spectrum-axis">
+      <span>← 傾向統一</span>
+      <span>維持現狀</span>
+      <span>傾向獨立 →</span>
+    </div>
+    <div class="spectrum-track" id="spectrumTrack"></div>
+  </div>
+
+  <div style="margin-top: 60px;">
+    <div class="section-title">左右經濟政策光譜</div>
+    <div class="spectrum-container">
+      <div class="spectrum-axis">
+        <span>← 國家干預／社會民主</span>
+        <span>中間</span>
+        <span>自由市場／保守 →</span>
+      </div>
+      <div class="spectrum-track" id="econTrack"></div>
+    </div>
+  </div>
+
+  <div style="margin-top: 60px;">
+    <div class="section-title">威權—自由民主光譜</div>
+    <div class="spectrum-container">
+      <div class="spectrum-axis">
+        <span>← 菁英治理導向</span>
+        <span></span>
+        <span>直接民主導向 →</span>
+      </div>
+      <div class="spectrum-track" id="demTrack"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PANEL 3: 2D SCATTER ══════════ -->
+<div class="panel" id="panel-scatter">
+  <div class="section-title">二維座標定位：統獨 × 社經立場</div>
+  <div style="position:relative; display:flex; justify-content:center;">
+    <div class="scatter-wrap">
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim); margin-bottom:4px; font-family:'Space Mono',monospace;">
+        <span>左派 / 社會民主</span><span>右派 / 保守市場</span>
+      </div>
+      <div class="scatter-canvas" id="scatterCanvas" style="height:500px;">
+        <div style="position:absolute;top:4px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text-dim);font-family:'Space Mono',monospace;">台灣獨立</div>
+        <div style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text-dim);font-family:'Space Mono',monospace;">兩岸統一</div>
+        <div id="scatterDots"></div>
+      </div>
+      <div class="scatter-x-label" style="margin-top:8px;">← 社會民主 &nbsp;|&nbsp; 自由市場 →</div>
+    </div>
+  </div>
+  <p style="text-align:center;font-size:11px;color:var(--text-dim);margin-top:20px;font-family:'Space Mono',monospace;">滑鼠懸停查看詳情 · 位置為相對概念性定位</p>
+</div>
+
+<!-- ══════════ PANEL 4: ISSUES ══════════ -->
+<div class="panel" id="panel-issues">
+  <div class="section-title">重大議題各黨立場</div>
+  <div class="issue-grid" id="issueGrid"></div>
+</div>
+
+<!-- ══════════ PANEL 5: COMPARISON ══════════ -->
+<div class="panel" id="panel-comparison">
+  <div class="section-title">各黨比較分析表</div>
+  <div style="overflow-x:auto;">
+    <table class="compare-table" id="compareTable"></table>
+  </div>
+</div>
+
+<!-- ══════════ PANEL 6: HISTORY ══════════ -->
+<div class="panel" id="panel-history">
+  <div class="section-title">台灣政黨發展歷史脈絡</div>
+  <div class="timeline" id="timeline"></div>
+</div>
+
+<!-- ══════════ PANEL 7: ANALYSIS ══════════ -->
+<div class="panel" id="panel-analysis">
+  <div class="section-title">深度結構性分析</div>
+  <div id="analysisBlocks"></div>
+</div>
+
+</main>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+/* ═══════════════ DATA ═══════════════ */
+
+const PARTIES = [
+  {
+    id: 'dpp',
+    name: '民主進步黨',
+    nameEn: 'Democratic Progressive Party (DPP)',
+    abbr: '民進',
+    color: '#2da84e',
+    badge: 'badge-ruling',
+    badgeText: '執政黨',
+    founded: 1986,
+    seats: 51,
+    totalSeats: 113,
+    desc: '台灣本土化運動的政治結晶，自黨外運動中演化而來。長期強調台灣主體意識，在民主化過程中扮演關鍵角色。2000年首次執政打破國民黨長期壟斷，2016年起連續三屆取得國會多數。2024年賴清德就任總統，但立院失去過半優勢。黨內存在深綠基本盤與溫和本土派的張力。',
+    tags: ['台灣本土', '中間偏左', '自由主義', '親美日', '勞工友善'],
+    dims: { 獨立傾向: 85, 民主自由: 88, 社會進步: 80, 族群代表: 65 },
+    uniqScore: 82,
+    econScore: 40,
+    scatter: { x: 35, y: 18 }
+  },
+  {
+    id: 'kmt',
+    name: '中國國民黨',
+    nameEn: 'Kuomintang (KMT)',
+    abbr: '國民',
+    color: '#4a6fd0',
+    badge: 'badge-major-opp',
+    badgeText: '最大在野',
+    founded: 1919,
+    seats: 52,
+    totalSeats: 113,
+    desc: '1912年孫中山創立，1949年隨中華民國政府遷台。在台灣實行威權統治逾四十年，推動土地改革與經濟發展奇蹟，但同時壓制政治異見與台灣本土文化。近年在兩岸政策上傾向交流，接受「九二共識」框架，被批評者視為親中，支持者則視為務實。2024年立委選舉成為立院第一大黨。',
+    tags: ['中華文化認同', '兩岸交流', '保守主義', '財經右派', '傳統價值'],
+    dims: { 統一傾向: 60, 菁英治理: 72, 財政保守: 70, 歷史連結: 95 },
+    uniqScore: 35,
+    econScore: 68,
+    scatter: { x: 68, y: 75 }
+  },
+  {
+    id: 'tpp',
+    name: '台灣民眾黨',
+    nameEn: 'Taiwan People\'s Party (TPP)',
+    abbr: '民眾',
+    color: '#28c8c8',
+    badge: 'badge-minor',
+    badgeText: '關鍵少數',
+    founded: 2019,
+    seats: 8,
+    totalSeats: 113,
+    desc: '前台北市長柯文哲2019年創立，主打超越藍綠的「白色力量」。以中間路線、理性治理為號召，吸引厭倦傳統兩黨的年輕選民。2024年立委選舉獲八席，成為立院關鍵少數。然而柯文哲隨後因京華城案被羈押，重創黨的形象。黨的路線在超然中立與兩岸曖昧之間仍存在矛盾。',
+    tags: ['白色力量', '超越藍綠', '青年選民', '數據治理', '中間路線'],
+    dims: { 中間路線: 80, 年輕族群: 85, 治理導向: 75, 兩岸模糊: 55 },
+    uniqScore: 55,
+    econScore: 55,
+    scatter: { x: 52, y: 50 }
+  },
+  {
+    id: 'npp',
+    name: '時代力量',
+    nameEn: 'New Power Party (NPP)',
+    abbr: '時力',
+    color: '#f5c518',
+    badge: 'badge-minor',
+    badgeText: '小黨',
+    founded: 2015,
+    seats: 3,
+    totalSeats: 113,
+    desc: '2014年太陽花學運後，以學運世代為核心創立。初期與民進黨合作抗衡國民黨，後轉向與民進黨保持距離，堅守更鮮明的左翼台獨立場。強調社會公義、勞工保障、轉型正義。2020年後因路線爭議與核心人物出走，聲勢大幅衰退，但仍保有一定深綠進步選民基盤。',
+    tags: ['社運出身', '左翼台獨', '轉型正義', '勞工保障', '進步價值'],
+    dims: { 獨立傾向: 92, 社會進步: 88, 勞工友善: 82, 轉型正義: 90 },
+    uniqScore: 88,
+    econScore: 22,
+    scatter: { x: 18, y: 10 }
+  },
+  {
+    id: 'tsu',
+    name: '台灣團結聯盟',
+    nameEn: 'Taiwan Solidarity Union (TSU)',
+    abbr: '台聯',
+    color: '#e84545',
+    badge: 'badge-minor',
+    badgeText: '邊緣化',
+    founded: 2001,
+    seats: 0,
+    totalSeats: 113,
+    desc: '前總統李登輝精神支持下成立，定位為比民進黨更鮮明的本土政黨。全盛時期擁有相當席次，但長期被民進黨吸納選票，逐漸邊緣化。堅持深綠路線，對兩岸關係採強硬立場，強調台灣主體意識與去中國化。目前已無立委席次，影響力大幅萎縮。',
+    tags: ['深綠', '極度本土', '去中國化', '李登輝路線', '邊緣化'],
+    dims: { 獨立傾向: 98, 本土意識: 95, 歷史影響: 60, 現實影響: 10 },
+    uniqScore: 95,
+    econScore: 35,
+    scatter: { x: 25, y: 5 }
+  },
+  {
+    id: 'pfp',
+    name: '親民黨',
+    nameEn: 'People First Party (PFP)',
+    abbr: '親民',
+    color: '#e8720c',
+    badge: 'badge-minor',
+    badgeText: '衰退中',
+    founded: 2000,
+    seats: 0,
+    totalSeats: 113,
+    desc: '宋楚瑜2000年國民黨分裂後創立，曾是強大的泛藍第三勢力，立委席次一度超過四十席。以宋楚瑜個人魅力為核心，吸引本省籍泛藍選民與對國民黨不滿者。但隨宋楚瑜政治影響力衰退，親民黨逐漸泡沫化，目前已無立委席次。作為一個圍繞個人魅力建立的政黨的典型案例。',
+    tags: ['宋楚瑜', '泛藍第三勢力', '本省泛藍', '已式微', '個人魅力政治'],
+    dims: { 統一傾向: 50, 本省泛藍: 75, 歷史影響: 65, 現實影響: 5 },
+    uniqScore: 42,
+    econScore: 60,
+    scatter: { x: 60, y: 62 }
+  },
+  {
+    id: 'mkt',
+    name: '台灣基進',
+    nameEn: 'Taiwan Statebuilding Party',
+    abbr: '基進',
+    color: '#c44ec4',
+    badge: 'badge-minor',
+    badgeText: '激進本土',
+    founded: 2008,
+    seats: 1,
+    totalSeats: 113,
+    desc: '起源於台南的激進本土運動，主張明確宣布台灣獨立，反對九二共識框架，強硬抵制中國影響力滲透。對民進黨批評其對中國態度不夠強硬，有時充當民進黨的左翼盟友，有時充當其批評者。2024年獲一席，代表最鮮明的制憲台獨立場。',
+    tags: ['制憲台獨', '反中滲透', '深綠激進', '台南根基', '抗中最前線'],
+    dims: { 獨立傾向: 100, 抗中立場: 98, 進步價值: 75, 席次影響: 15 },
+    uniqScore: 98,
+    econScore: 25,
+    scatter: { x: 20, y: 8 }
+  },
+  {
+    id: 'ind',
+    name: '無黨籍及小黨聯盟',
+    nameEn: 'Independents & Minor Parties',
+    abbr: '無黨',
+    color: '#888',
+    badge: 'badge-minor',
+    badgeText: '分散',
+    founded: null,
+    seats: 3,
+    totalSeats: 113,
+    desc: '包含各類無黨籍立委與微型政黨。立場高度分散，橫跨從地方型政治人物到原住民族代表、勞工運動人士等不同背景。部分在特定議題上與大黨合作，部分保持獨立。體現台灣政治多元性，也反映現行選制下小黨生存困境。',
+    tags: ['高度分散', '地方型政治', '原住民族', '議題導向', '非意識形態'],
+    dims: { 分散程度: 95, 地方扎根: 70, 意識形態: 30, 議題靈活: 80 },
+    uniqScore: 50,
+    econScore: 50,
+    scatter: { x: 48, y: 48 }
+  }
+];
+
+const ISSUES = [
+  {
+    title: '兩岸關係定位',
+    stances: [
+      { id: 'dpp', stance: '台灣是主權獨立國家，反對九二共識，主張維持現狀但拒絕統一壓力' },
+      { id: 'kmt', stance: '接受九二共識（「一中各表」），主張兩岸在政治互信基礎上交流，反對激進台獨' },
+      { id: 'tpp', stance: '立場模糊，既不接受九二共識，也不明確支持獨立，強調「維持現狀」' },
+      { id: 'npp', stance: '明確支持台灣獨立建國，反對任何形式的統一' },
+      { id: 'mkt', stance: '主張立即制憲建國，最強硬的反統立場' }
+    ]
+  },
+  {
+    title: '核能政策',
+    stances: [
+      { id: 'dpp', stance: '原則反核，推動2025非核家園（已略為延遲），積極發展再生能源' },
+      { id: 'kmt', stance: '支持重啟核電或延役，以穩定供電與降低電費為訴求' },
+      { id: 'tpp', stance: '傾向務實考量，不排除核電作為過渡選項，批評執政黨能源政策規劃不足' },
+      { id: 'npp', stance: '反核立場，但強調應同步加速再生能源建設' }
+    ]
+  },
+  {
+    title: '同婚與性別平權',
+    stances: [
+      { id: 'dpp', stance: '2019年通過亞洲首部同婚專法，政策方向進步' },
+      { id: 'kmt', stance: '黨內多數持保守立場，多反對同婚專法，傾向公投決定' },
+      { id: 'tpp', stance: '柯文哲個人支持，但黨的立場較模糊，傾向尊重多元' },
+      { id: 'npp', stance: '強力支持同婚及完整平等權利，是最進步的性別立場' },
+      { id: 'mkt', stance: '支持性別平等，進步立場' }
+    ]
+  },
+  {
+    title: '憲政改革',
+    stances: [
+      { id: 'dpp', stance: '主張漸進式修憲，降低門檻，但對涉及國號領土的敏感條款謹慎' },
+      { id: 'kmt', stance: '傾向維護中華民國憲政體制，反對任何實質改變國家定位的修憲' },
+      { id: 'tpp', stance: '支持部分憲改，如18歲公民權，立場較務實' },
+      { id: 'npp', stance: '主張制憲正名，建立以「台灣」為名的新憲法' }
+    ]
+  },
+  {
+    title: '勞工與社會福利',
+    stances: [
+      { id: 'dpp', stance: '中間偏左，推動勞基法修正、育兒補貼擴大，但被部分勞工團體批評不夠積極' },
+      { id: 'kmt', stance: '傳統上偏向資方，近年也強調民生議題，試圖爭取勞工選票' },
+      { id: 'tpp', stance: '強調效率與市場機制，社會福利立場較不鮮明' },
+      { id: 'npp', stance: '最強調勞工保障，主張縮短工時、提高基本工資、強化集體談判' }
+    ]
+  },
+  {
+    title: '對美中關係戰略',
+    stances: [
+      { id: 'dpp', stance: '強化台美實質關係，接受美軍援助，在中美博弈中明確靠近民主陣營' },
+      { id: 'kmt', stance: '主張在美中之間維持平衡，避免選邊，認為改善兩岸關係有助降低風險' },
+      { id: 'tpp', stance: '傾向務實外交，不希望台灣成為大國競爭棋子，立場較中性' },
+      { id: 'npp', stance: '明確支持台美同盟深化，視中共為主要威脅' }
+    ]
+  }
+];
+
+const TIMELINE_DATA = [
+  { year: '1949', text: '<strong>中華民國政府遷台</strong>，國民黨在台實施黨禁、戒嚴，開始長達三十八年的威權統治。' },
+  { year: '1960s–70s', text: '<strong>黨外運動興起</strong>，在國民黨一黨統治下，有識之士透過雜誌、選舉等有限空間逐漸積累反對力量。' },
+  { year: '1979', text: '<strong>美麗島事件</strong>，黨外運動遭嚴厲鎮壓，多人被捕入獄，但弔詭地加速了民主運動的社會同情與集結。' },
+  { year: '1986', text: '<strong>民主進步黨成立</strong>，在戒嚴法仍有效之際公然宣布建黨，是台灣民主化的重要里程碑。' },
+  { year: '1987', text: '<strong>戒嚴解除</strong>，長達三十八年的戒嚴時期結束，黨禁、報禁逐步解除，政治多元化開始。' },
+  { year: '1991–1996', text: '<strong>民主轉型完成</strong>，終止動員戡亂時期、全面改選立法院、首次直選總統。1996年台海危機下，李登輝高票當選。' },
+  { year: '2000', text: '<strong>首次政黨輪替</strong>，陳水扁以39.3%得票率當選總統，國民黨首次失去中央執政權。<strong>親民黨</strong>宋楚瑜同年創立。' },
+  { year: '2001', text: '<strong>台灣團結聯盟</strong>在前總統李登輝精神支持下成立，泛綠陣營進一步分化。' },
+  { year: '2008', text: '<strong>馬英九當選</strong>，國民黨重返執政，大幅推進兩岸交流，簽署ECFA等協議，但也引發本土派危機感。<strong>台灣基進</strong>同年在台南成立。' },
+  { year: '2014', text: '<strong>太陽花學運</strong>，反對《海峽兩岸服務貿易協議》，學生占領立法院，掀起公民意識高漲，催生下一代政治力量。' },
+  { year: '2015', text: '<strong>時代力量</strong>由林昶佐、黃國昌等學運世代創立，定位為進步台獨左翼。' },
+  { year: '2016', text: '<strong>民進黨完全執政</strong>，蔡英文當選總統，民進黨取得立院絕對多數，時代力量獲五席，台灣進入新政治格局。' },
+  { year: '2019', text: '<strong>同婚合法化</strong>，台灣成為亞洲首個同性婚姻合法國家。<strong>台灣民眾黨</strong>由柯文哲創立，主打超越藍綠。' },
+  { year: '2020', text: '<strong>蔡英文連任</strong>，民進黨維持立院多數，時代力量因路線爭議分裂，黃國昌出走。香港情勢惡化進一步強化台灣人認同。' },
+  { year: '2024', text: '<strong>三黨鼎立新格局</strong>，賴清德以四成票當選總統，民進黨、國民黨、民眾黨在立院形成三足鼎立。<strong>柯文哲因京華城案被羈押</strong>，白色力量面臨嚴峻考驗。' }
+];
+
+const ANALYSIS_BLOCKS = [
+  {
+    title: '一、藍綠結構的本質：國家認同先於左右之分',
+    content: `台灣的政黨競爭首要分裂軸線並非左右，而是國家認同——即「是否認同台灣是一個獨立的政治實體」。這一結構使得台灣的政黨體系與西方民主國家根本不同：一個政黨可以是「本土保守派」（如民進黨部分派系），也可以是「統派左翼」（理論上可能存在），但現實政治使後者幾乎沒有生存空間。
+
+這導致了一個弔詭現象：台灣沒有真正意義上的「台灣認同左翼政黨」能長期茁壯——時代力量雖嘗試填補這個位置，但夾在深綠基本盤（被民進黨吸納）與進步選民（被民眾黨競爭）之間，空間極為有限。`
+  },
+  {
+    title: '二、「白色力量」的結構性矛盾',
+    content: `台灣民眾黨2024年選舉的亮眼成績，揭示了選民對傳統藍綠框架的疲倦，但白色力量自身存在深層矛盾：它訴諸「超越意識形態的理性治理」，但在最根本的兩岸關係上無法真正迴避選邊。
+
+柯文哲的模糊策略在選舉上有效，卻在施政上製造混亂。加之柯文哲涉及司法案件，民眾黨必須在「為創黨領袖護航」與「維護法治形象」之間兩難選擇。這個矛盾是組織性的，而非偶發的——圍繞個人魅力建立的政黨，缺乏應對創始人失格的制度性資源。`
+  },
+  {
+    title: '三、國民黨的轉型困境：中華民國認同的重新詮釋',
+    content: `現代國民黨面臨一個幾乎無解的認同困境：它的歷史正當性建立在「中華民國」這個國家框架上，而這個框架在當代台灣的多數民意認知中越來越接近「台灣」，而非「中國」。
+
+這意味著，國民黨若要擴大票倉，需要吸引認同「台灣」的選民；但若要鞏固核心支持者，需要維護中華民國法統與兩岸交流路線。這兩者並非完全對立，但在操作上極難兼顧。馬英九的「台灣認同中華民國」論述曾是一種有效的折衷，但在台灣意識持續上升的背景下，這個論述的生命力正在萎縮。`
+  },
+  {
+    title: '四、三黨鼎立下的立法院：否決政治的結構性後果',
+    content: `2024年的選舉結果產生了一個沒有過半政黨的立法院：民進黨51席、國民黨52席、民眾黨8席、其他2席。這在制度上形成了「分裂政府」，且藍白合作取得操控多數的結構。
+
+然而，國民黨與民眾黨的合作是機會主義的，而非意識形態上的盟友關係。這種「否決聯合」能夠阻止執政黨推動的政策，卻很難形成建設性的替代方案。短期內，這可能推動更多協商政治；長期而言，若僵局持續，可能強化選民對立法院效能的失望，反而有利於強調決策效率的政治力量。`
+  },
+  {
+    title: '五、族群政治的微妙轉化：從「省籍」到「認同」',
+    content: `台灣政治早期以「省籍矛盾」——外省人vs本省人——為核心分裂線。半世紀後，這個結構已大幅轉化：第二、三代「外省人」在文化認同上越來越接近台灣，純粹的省籍政治已式微。
+
+取而代之的是更複雜的「認同光譜」：從「我是台灣人」到「我既是台灣人也是中國人」到「我是中國人」，民調顯示前者占絕對多數且持續增加。但這個「台灣認同」並不必然等同於「支持獨立」——許多人在認同台灣的同時傾向維持現狀。原住民族的政治代表性問題，也日益從邊緣走向中心討論。`
+  },
+  {
+    title: '六、青年政治參與的結構性特徵',
+    content: `台灣年輕世代的政治參與具有幾個特徵：台灣認同比例最高、對傳統政黨忠誠度最低、對社會議題（性別、環境、勞工）關注度最高。他們是台灣民眾黨的主要支持者，也是時代力量曾經的基本盤。
+
+然而，「年輕人不認同藍綠舊框架」並不等於「年輕人沒有政治立場」。調查顯示，台灣年輕人在兩岸關係上立場清晰且傾向本土，在社會議題上進步，在經濟議題上關注房價、低薪等結構問題。這個世代的政治力量尚未找到穩定的組織性出口，是未來政治重組的最大變數。`
+  }
+];
+
+/* ═══════════════ RENDER FUNCTIONS ═══════════════ */
+
+function getParty(id) { return PARTIES.find(p => p.id === id); }
+
+// ── Overview
+function renderOverview() {
+  const grid = document.getElementById('partyGrid');
+  grid.innerHTML = '';
+  PARTIES.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'party-card';
+    card.style.setProperty('--party-color', p.color);
+
+    const dimHtml = Object.entries(p.dims).map(([k, v]) => `
+      <div class="dim-row">
+        <div class="dim-label">${k}</div>
+        <div class="dim-bar-wrap"><div class="dim-bar" style="width:${v}%"></div></div>
+        <div class="dim-val">${v}</div>
+      </div>`).join('');
+
+    const tagHtml = p.tags.map(t => `<span class="tag">${t}</span>`).join('');
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div>
+          <div class="party-name">${p.name}</div>
+          <div class="party-name-en">${p.nameEn}</div>
+        </div>
+        <span class="party-badge ${p.badge}">${p.badgeText}</span>
+      </div>
+      <div class="party-desc">${p.desc}</div>
+      ${dimHtml}
+      <div class="tag-row">${tagHtml}</div>
+      <div style="margin-top:16px; font-size:11px; color:var(--text-dim); font-family:'Space Mono',monospace;">
+        ${p.founded ? `成立：${p.founded}年` : '無固定成立年'} &nbsp;·&nbsp; 立委席次：<span style="color:${p.color};font-weight:700">${p.seats}</span> / ${p.totalSeats}
+        <div class="seat-bar" style="margin-top:6px; --party-color:${p.color}">
+          <div class="seat-segment" style="width:${(p.seats/p.totalSeats)*100}%; background:${p.color};"></div>
+          <div class="seat-segment" style="flex:1; background:rgba(255,255,255,0.05);"></div>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ── Spectrum
+function renderSpectrum() {
+  const specs = [
+    { trackId: 'spectrumTrack', key: 'uniqScore' },
+    { trackId: 'econTrack', key: 'econScore', inverted: true },
+    { trackId: 'demTrack', values: { dpp: 70, kmt: 30, tpp: 60, npp: 80, tsu: 75, pfp: 25, mkt: 85, ind: 50 } }
+  ];
+  specs.forEach(s => {
+    const track = document.getElementById(s.trackId);
+    track.innerHTML = '';
+    PARTIES.forEach(p => {
+      let pct;
+      if (s.key) pct = p[s.key];
+      else if (s.values) pct = s.values[p.id] || 50;
+
+      const dot = document.createElement('div');
+      dot.className = 'spectrum-dot';
+      dot.style.left = pct + '%';
+      dot.style.setProperty('--party-color', p.color);
+      dot.style.background = p.color;
+      const label = document.createElement('div');
+      label.className = 'spectrum-dot-label';
+      label.textContent = p.abbr;
+      label.style.color = p.color;
+      dot.appendChild(label);
+      track.appendChild(dot);
+    });
+  });
+}
+
+// ── Scatter
+function renderScatter() {
+  const container = document.getElementById('scatterDots');
+  container.innerHTML = '';
+  PARTIES.forEach(p => {
+    const dot = document.createElement('div');
+    dot.className = 'scatter-dot';
+    // x: econScore (0=left,100=right), y: uniqScore inverted (100=indie, 0=unify)
+    const xPct = p.scatter.x;
+    const yPct = 100 - p.scatter.y; // invert y
+    dot.style.left = xPct + '%';
+    dot.style.top = yPct + '%';
+    dot.style.background = p.color;
+    dot.style.boxShadow = `0 0 0 2px ${p.color}44`;
+    dot.innerHTML = `<span>${p.abbr[0]}</span><div class="dot-label" style="color:${p.color}">${p.abbr}</div>`;
+
+    dot.addEventListener('mouseenter', e => showTooltip(e, `<strong style="color:${p.color}">${p.name}</strong><br/>${p.seats}席 · ${p.badgeText}`));
+    dot.addEventListener('mouseleave', hideTooltip);
+    container.appendChild(dot);
+  });
+}
+
+// ── Issues
+function renderIssues() {
+  const grid = document.getElementById('issueGrid');
+  grid.innerHTML = '';
+  ISSUES.forEach(issue => {
+    const card = document.createElement('div');
+    card.className = 'issue-card';
+    const rowsHtml = issue.stances.map(s => {
+      const p = getParty(s.id);
+      if (!p) return '';
+      return `<div class="issue-party-row">
+        <div class="issue-party-name" style="color:${p.color}">${p.abbr}</div>
+        <div class="issue-stance">
+          <span class="stance-icon" style="background:${p.color}"></span>${s.stance}
+        </div>
+      </div>`;
+    }).join('');
+    card.innerHTML = `<div class="issue-title">${issue.title}</div>${rowsHtml}`;
+    grid.appendChild(card);
+  });
+}
+
+// ── Comparison Table
+function renderComparison() {
+  const cols = ['政黨', '成立年', '立委席次', '統獨立場', '社經政策', '執政歷史', '主要選民'];
+  const rows = [
+    ['民主進步黨', '1986', '51席', '維持現狀偏獨', '中左', '2000–08 / 2016–今', '本省閩南、年輕世代、南台灣'],
+    ['中國國民黨', '1919', '52席', '九二共識傾統', '中右', '1949–2000 / 2008–16', '外省族群、軍公教、中北台灣'],
+    ['台灣民眾黨', '2019', '8席', '模糊中間路線', '中間', '地方首長（已失台北市）', '年輕選民、都會中產、藍綠厭倦者'],
+    ['時代力量', '2015', '3席', '明確台獨', '左翼', '無執政經驗', '進步選民、社運圈、年輕深綠'],
+    ['台灣基進', '2008', '1席', '制憲台獨', '左中', '無執政經驗', '南台灣激進本土選民'],
+    ['台灣團結聯盟', '2001', '0席', '深綠去中化', '左中', '曾為泛綠盟友', '深綠老票倉（急速萎縮）'],
+    ['親民黨', '2000', '0席', '泛藍溫和統', '中右', '未執政', '本省泛藍（已式微）'],
+  ];
+  let html = '<thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+  rows.forEach((r, i) => {
+    const p = PARTIES[i];
+    html += '<tr>' + r.map((cell, j) => {
+      if (j === 0) return `<td><span class="party-indicator" style="background:${p ? p.color : '#888'}"></span>${cell}</td>`;
+      return `<td>${cell}</td>`;
+    }).join('') + '</tr>';
+  });
+  html += '</tbody>';
+  document.getElementById('compareTable').innerHTML = html;
+}
+
+// ── Timeline
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = TIMELINE_DATA.map(item => `
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">${item.year}</div>
+      <div class="timeline-text">${item.text}</div>
+    </div>`).join('');
+}
+
+// ── Analysis
+function renderAnalysis() {
+  const container = document.getElementById('analysisBlocks');
+  container.innerHTML = ANALYSIS_BLOCKS.map(b => `
+    <div class="analysis-block">
+      <h3>${b.title}</h3>
+      ${b.content.split('\n\n').map(p => `<p>${p}</p>`).join('')}
+    </div>`).join('');
+}
+
+/* ── TOOLTIP ── */
+function showTooltip(e, html) {
+  const tt = document.getElementById('tooltip');
+  tt.innerHTML = html;
+  tt.classList.add('show');
+  moveTip(e);
+}
+function moveTip(e) {
+  const tt = document.getElementById('tooltip');
+  tt.style.left = (e.clientX + 14) + 'px';
+  tt.style.top = (e.clientY - 10) + 'px';
+}
+function hideTooltip() { document.getElementById('tooltip').classList.remove('show'); }
+document.addEventListener('mousemove', moveTip);
+
+/* ── TAB SWITCHING ── */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* ── INIT ── */
+renderOverview();
+renderSpectrum();
+renderScatter();
+renderIssues();
+renderComparison();
+renderTimeline();
+renderAnalysis();
+</script>
+</body>
+</html>
